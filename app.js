@@ -2,6 +2,7 @@ const axios = require('axios');
 const express = require("express")
 const bodyParser = require("body-parser");
 const e = require('express');
+const { create } = require('domain');
 const app = express()
 const PORT = process.env.PORT || 3000;
 require('dotenv').config();
@@ -67,12 +68,37 @@ async function getUserActivities(access_token) {
     }
 }
 
-
+async function createTask(activityInfo) {
+    try {
+       let res = await axios({
+            url: `https://api.clickup.com/api/v2/list/193709015/task`,
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': process.env.clickup_api
+            },
+            data: {
+                'name': activityInfo.name
+            }
+        })
+        if(res.status == 200){
+            console.log(res.status)
+        }     
+        return res.data
+    }
+    catch (err) {
+        console.error(err);
+    }
+}
 
 
 getUserKey().then(userRes => {
     console.log(userRes)
     getUserActivities(userRes.access_token).then(userActivitiesRes => {
         console.log(userActivitiesRes)
+        for (let i = 0; i < userActivitiesRes.length; i++) {
+            createTask(userActivitiesRes[i])
+            
+        }
     })
 })
