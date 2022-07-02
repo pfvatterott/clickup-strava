@@ -9,6 +9,15 @@ require('dotenv').config();
 app.use(bodyParser.json())
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
 let refreshToken;
+let distance;
+let movingTime
+let elapsedTime
+let elevationGain
+let sportType
+let averageSpeed
+let maxSpeed
+let maxHeart
+let averageHeart
 
 async function getUserKey() {
     if (refreshToken != null) {
@@ -78,7 +87,41 @@ async function createTask(activityInfo) {
                 'Authorization': process.env.clickup_api
             },
             data: {
-                'name': activityInfo.name
+                'name': activityInfo.name,
+                "custom_fields": [
+                    {
+                        'id': elapsedTime,
+                        'value': activityInfo.elapsed_time
+                    },
+                    {
+                        'id': elevationGain,
+                        'value': activityInfo.total_elevation_gain
+                    },
+                    {
+                        'id': averageSpeed,
+                        'value': activityInfo.average_speed
+                    },
+                ]
+            }
+        })
+        if(res.status == 200){
+            console.log(res.status)
+        }     
+        return res.data
+    }
+    catch (err) {
+        console.error(err);
+    }
+}
+
+async function mapCustomFields() {
+    try {
+       let res = await axios({
+            url: `https://api.clickup.com/api/v2/list/193709015/field`,
+            method: 'get',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': process.env.clickup_api
             }
         })
         if(res.status == 200){
@@ -95,10 +138,47 @@ async function createTask(activityInfo) {
 getUserKey().then(userRes => {
     console.log(userRes)
     getUserActivities(userRes.access_token).then(userActivitiesRes => {
-        console.log(userActivitiesRes)
-        for (let i = 0; i < userActivitiesRes.length; i++) {
-            createTask(userActivitiesRes[i])
+        mapCustomFields().then(customFields => {
+            for (let i = 0; i < customFields.fields.length; i++) {
+                if (customFields.fields[i].name === 'Elapsed Time') {
+                    elapsedTime = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Elevation Gain') {
+                    elevationGain = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Average Speed') {
+                    averageSpeed = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Distance') {
+                    distance = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Average Heartrate') {
+                    averageHeart = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Moving Time') {
+                    movingTime = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Sport Type') {
+                    sportType = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Max Speed') {
+                    maxSpeed = customFields.fields[i].id
+                }
+                else if (customFields.fields[i].name === 'Max Heartrate') {
+                    maxHeart = customFields.fields[i].id
+                }
+            }
+        }).then(() => {
+            console.log(userActivitiesRes)
+            for (let i = 0; i < userActivitiesRes.length; i++) {
+                createTask(userActivitiesRes[i])
+                
+            }
+        })
+        // console.log(userActivitiesRes)
+        // for (let i = 0; i < userActivitiesRes.length; i++) {
+        //     createTask(userActivitiesRes[i])
             
-        }
+        // }
     })
 })
