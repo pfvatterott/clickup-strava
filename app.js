@@ -1,8 +1,6 @@
 const axios = require('axios');
 const express = require("express")
 const bodyParser = require("body-parser");
-const e = require('express');
-const { create } = require('domain');
 const app = express()
 const PORT = process.env.PORT || 3000;
 require('dotenv').config();
@@ -19,6 +17,19 @@ let maxSpeed
 let maxHeart
 let averageHeart
 let sportTypeArray
+
+
+//webhook listener and validator
+app.post("/hook", (req, res) => {
+    console.log( 'req ' + req)
+    console.log('res ' + res)
+    // res.status(200).send(
+    //     {
+    //         'hub.challenge': abc
+    //     }
+    // )
+    
+})
 
 async function getUserKey() {
     if (refreshToken != null) {
@@ -62,7 +73,7 @@ async function getUserKey() {
 async function getUserActivities(access_token) {
     try {
        let res = await axios({
-            url: `https://www.strava.com/api/v3/athlete/activities?per_page=30&access_token=${access_token}`,
+            url: `https://www.strava.com/api/v3/athlete/activities?per_page=100&access_token=${access_token}`,
             method: 'get',
             headers: {
                 'Content-Type': 'application/json'
