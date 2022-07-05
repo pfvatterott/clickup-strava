@@ -78,7 +78,7 @@ async function getUserActivities(access_token) {
     }
 }
 
-async function createTask(activityInfo, sportTypeOption, startDate) {
+async function createTask(activityInfo, sportTypeOption, movingTimeTotal, elapsedTimeTotal) {
     try {
        let res = await axios({
             url: `https://api.clickup.com/api/v2/list/193709015/task`,
@@ -94,7 +94,7 @@ async function createTask(activityInfo, sportTypeOption, startDate) {
                 "custom_fields": [
                     {
                         'id': elapsedTime,
-                        'value': activityInfo.elapsed_time
+                        'value': elapsedTimeTotal
                     },
                     {
                         'id': elevationGain,
@@ -114,7 +114,7 @@ async function createTask(activityInfo, sportTypeOption, startDate) {
                     },
                     {
                         'id': movingTime,
-                        'value': activityInfo.moving_time
+                        'value': movingTimeTotal
                     },
                     {
                         'id': maxSpeed,
@@ -163,7 +163,6 @@ async function mapCustomFields() {
 
 
 getUserKey().then(userRes => {
-    console.log(userRes)
     getUserActivities(userRes.access_token).then(userActivitiesRes => {
         mapCustomFields().then(customFields => {
             for (let i = 0; i < customFields.fields.length; i++) {
@@ -197,9 +196,10 @@ getUserKey().then(userRes => {
                 }
             }
         }).then(() => {
-            console.log(userActivitiesRes)
             for (let i = 0; i < userActivitiesRes.length; i++) {
                 let sportTypeOption
+                let movingTime = new Date(userActivitiesRes[i].moving_time * 1e3).toISOString().slice(-13, -5)
+                let elapsedTime = new Date(userActivitiesRes[i].elapsed_time * 1e3).toISOString().slice(-13, -5)
                 if (userActivitiesRes[i].sport_type === 'AlpineSki') {
                     for (let j = 0; j < sportTypeArray.length; j++) {
                         if (sportTypeArray[j].name === 'Ski') {
@@ -228,13 +228,8 @@ getUserKey().then(userRes => {
                         }
                     }
                 }
-                createTask(userActivitiesRes[i], sportTypeOption)
+                createTask(userActivitiesRes[i], sportTypeOption, movingTime, elapsedTime)
             }
         })
-        // console.log(userActivitiesRes)
-        // for (let i = 0; i < userActivitiesRes.length; i++) {
-        //     createTask(userActivitiesRes[i])
-            
-        // }
     })
 })
