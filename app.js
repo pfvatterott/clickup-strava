@@ -18,6 +18,7 @@ let averageSpeed
 let maxSpeed
 let maxHeart
 let averageHeart
+let sportTypeArray
 
 async function getUserKey() {
     if (refreshToken != null) {
@@ -77,7 +78,7 @@ async function getUserActivities(access_token) {
     }
 }
 
-async function createTask(activityInfo) {
+async function createTask(activityInfo, sportTypeOption) {
     try {
        let res = await axios({
             url: `https://api.clickup.com/api/v2/list/193709015/task`,
@@ -100,6 +101,30 @@ async function createTask(activityInfo) {
                     {
                         'id': averageSpeed,
                         'value': activityInfo.average_speed
+                    },
+                    {
+                        'id': distance,
+                        'value': activityInfo.distance
+                    },
+                    {
+                        'id': averageHeart,
+                        'value': activityInfo.average_heartrate
+                    },
+                    {
+                        'id': movingTime,
+                        'value': activityInfo.moving_time
+                    },
+                    {
+                        'id': maxSpeed,
+                        'value': activityInfo.max_speed
+                    },
+                    {
+                        'id': maxHeart,
+                        'value': activityInfo.max_heartrate
+                    },
+                    {
+                        'id': sportType,
+                        'value': sportTypeOption
                     },
                 ]
             }
@@ -160,6 +185,7 @@ getUserKey().then(userRes => {
                 }
                 else if (customFields.fields[i].name === 'Sport Type') {
                     sportType = customFields.fields[i].id
+                    sportTypeArray = customFields.fields[i].type_config.options
                 }
                 else if (customFields.fields[i].name === 'Max Speed') {
                     maxSpeed = customFields.fields[i].id
@@ -171,8 +197,36 @@ getUserKey().then(userRes => {
         }).then(() => {
             console.log(userActivitiesRes)
             for (let i = 0; i < userActivitiesRes.length; i++) {
-                createTask(userActivitiesRes[i])
-                
+                let sportTypeOption
+                if (userActivitiesRes[i].sport_type === 'AlpineSki') {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Ski') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                else if (userActivitiesRes[i].sport_type === 'Run') {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Run') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                else if (userActivitiesRes[i].sport_type === 'Ride') {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Bike') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                else {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Other') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                createTask(userActivitiesRes[i], sportTypeOption)
             }
         })
         // console.log(userActivitiesRes)
