@@ -78,7 +78,7 @@ async function getUserActivities(access_token) {
     }
 }
 
-async function createTask(activityInfo, sportTypeOption) {
+async function createTask(activityInfo, sportTypeOption, startDate) {
     try {
        let res = await axios({
             url: `https://api.clickup.com/api/v2/list/193709015/task`,
@@ -89,6 +89,8 @@ async function createTask(activityInfo, sportTypeOption) {
             },
             data: {
                 'name': activityInfo.name,
+                "start_date_time": true,
+                "start_date": Math.floor(new Date(activityInfo.start_date).getTime()),
                 "custom_fields": [
                     {
                         'id': elapsedTime,
@@ -96,15 +98,15 @@ async function createTask(activityInfo, sportTypeOption) {
                     },
                     {
                         'id': elevationGain,
-                        'value': activityInfo.total_elevation_gain
+                        'value': (Math.round((activityInfo.total_elevation_gain * 3.28084) * 100) / 100)
                     },
                     {
                         'id': averageSpeed,
-                        'value': activityInfo.average_speed
+                        'value': (Math.round((activityInfo.average_speed * 2.236421725) * 100) / 100)
                     },
                     {
                         'id': distance,
-                        'value': activityInfo.distance
+                        'value': (Math.round((activityInfo.distance * 0.000621371) * 100) / 100)
                     },
                     {
                         'id': averageHeart,
@@ -116,7 +118,7 @@ async function createTask(activityInfo, sportTypeOption) {
                     },
                     {
                         'id': maxSpeed,
-                        'value': activityInfo.max_speed
+                        'value': (Math.round((activityInfo.max_speed * 2.236421725) * 100) / 100)
                     },
                     {
                         'id': maxHeart,
