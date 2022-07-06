@@ -20,7 +20,7 @@ let sportTypeArray
 
 
 //webhook listener and validator
-app.post("/hook", (req, res) => {
+app.get("/hook", (req, res) => {
     console.log(req)
     console.log(res)
     // res.status(200).send(
