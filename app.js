@@ -21,15 +21,22 @@ let sportTypeArray
 
 //webhook listener and validator
 app.get("/hook", (req, res) => {
-    console.log(req.query['hub.challenge'])
-    console.log(res.query['hub.challenge'])
-    // res.status(200).send(
-    //     {
-    //         'hub.challenge': abc
-    //     }
-    // )
-    
+    if (req.query['hub.challenge']) {
+        console.log(req.query['hub.challenge'])
+        let hubChallengeId = req.query['hub.challenge']
+        res.status(200).send(
+            {
+                'hub.challenge': hubChallengeId
+            }
+        )
+    }
+    else {
+        res.status(200).end()
+        console.log(req.body)
+    }
 })
+
+
 
 async function getUserKey() {
     if (refreshToken != null) {
