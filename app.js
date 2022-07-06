@@ -32,13 +32,12 @@ app.get("/hook", (req, res) => {
     }
     else {
         res.status(200).end()
-        console.log(req.body)
     }
 })
 
 app.post("/hook", (req, res) => {
     res.status(200).end()
-    console.log(req.body)
+    console.log(req)
 })
 
 
