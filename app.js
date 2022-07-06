@@ -142,7 +142,7 @@ async function getUserKey() {
 async function getUserActivities(access_token) {
     try {
        let res = await axios({
-            url: `https://www.strava.com/api/v3/athlete/activities?per_page=10&access_token=${access_token}`,
+            url: `https://www.strava.com/api/v3/athlete/activities?per_page=150&access_token=${access_token}`,
             method: 'get',
             headers: {
                 'Content-Type': 'application/json'
