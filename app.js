@@ -17,6 +17,7 @@ let maxSpeed
 let maxHeart
 let averageHeart
 let sportTypeArray
+let userAccessToken
 
 
 //webhook listener and validator
@@ -37,8 +38,32 @@ app.get("/hook", (req, res) => {
 
 app.post("/hook", (req, res) => {
     res.status(200).end()
-    console.log(req)
+    console.log(req.body)
+    if (req.body.aspect_type === 'create') {
+        getActivityInfo(activityId).then(activityRes => {
+            console.log(activityRes)
+        })
+    }
 })
+
+async function getActivityInfo(activityId) {
+    try {
+       let res = await axios({
+            url: `https://www.strava.com/api/v3/activities/${activityId}&access_token=${userAccessToken}`,
+            method: 'get',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if(res.status == 200){
+            console.log(res.status)
+        }     
+        return res.data
+    }
+    catch (err) {
+        console.error(err);
+    }
+}
 
 
 
@@ -185,6 +210,7 @@ async function mapCustomFields() {
 
 
 getUserKey().then(userRes => {
+    userAccessToken = userRes.access_token
     getUserActivities(userRes.access_token).then(userActivitiesRes => {
         mapCustomFields().then(customFields => {
             for (let i = 0; i < customFields.fields.length; i++) {
