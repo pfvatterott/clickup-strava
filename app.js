@@ -49,7 +49,7 @@ app.post("/hook", (req, res) => {
 async function getActivityInfo(activityId) {
     try {
        let res = await axios({
-            url: `https://www.strava.com/api/v3/activities/${activityId}&access_token=${userAccessToken}`,
+            url: `https://www.strava.com/api/v3/activities/${activityId}?access_token=${userAccessToken}`,
             method: 'get',
             headers: {
                 'Content-Type': 'application/json'
