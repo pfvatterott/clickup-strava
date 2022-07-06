@@ -38,10 +38,43 @@ app.get("/hook", (req, res) => {
 
 app.post("/hook", (req, res) => {
     res.status(200).end()
-    console.log(req.body)
     if (req.body.aspect_type === 'create') {
         getActivityInfo(req.body.object_id).then(activityRes => {
-            console.log(activityRes)
+            let userActivitiesRes = [activityRes]
+            for (let i = 0; i < userActivitiesRes.length; i++) {
+                let sportTypeOption
+                let movingTime = new Date(userActivitiesRes[i].moving_time * 1e3).toISOString().slice(-13, -5)
+                let elapsedTime = new Date(userActivitiesRes[i].elapsed_time * 1e3).toISOString().slice(-13, -5)
+                if (userActivitiesRes[i].sport_type === 'AlpineSki') {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Ski') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                else if (userActivitiesRes[i].sport_type === 'Run') {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Run') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                else if (userActivitiesRes[i].sport_type === 'Ride') {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Bike') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                else {
+                    for (let j = 0; j < sportTypeArray.length; j++) {
+                        if (sportTypeArray[j].name === 'Other') {
+                            sportTypeOption = sportTypeArray[j].id
+                        }
+                    }
+                }
+                createTask(userActivitiesRes[i], sportTypeOption, movingTime, elapsedTime)
+            }
         })
     }
 })
