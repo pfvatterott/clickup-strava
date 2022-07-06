@@ -40,7 +40,7 @@ app.post("/hook", (req, res) => {
     res.status(200).end()
     console.log(req.body)
     if (req.body.aspect_type === 'create') {
-        getActivityInfo(activityId).then(activityRes => {
+        getActivityInfo(req.body.object_id).then(activityRes => {
             console.log(activityRes)
         })
     }
