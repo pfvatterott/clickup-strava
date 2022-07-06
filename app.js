@@ -21,8 +21,8 @@ let sportTypeArray
 
 //webhook listener and validator
 app.post("/hook", (req, res) => {
-    console.log(req.url)
-    console.log(res.url)
+    console.log(req)
+    console.log(res)
     // res.status(200).send(
     //     {
     //         'hub.challenge': abc
