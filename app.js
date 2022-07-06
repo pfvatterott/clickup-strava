@@ -36,6 +36,11 @@ app.get("/hook", (req, res) => {
     }
 })
 
+app.post("/hook", (req, res) => {
+    res.status(200).end()
+    console.log(req.body)
+})
+
 
 
 async function getUserKey() {
